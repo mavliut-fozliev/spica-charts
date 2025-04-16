@@ -1,0 +1,46 @@
+# Default values for spica.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+database:
+  replicas: 1
+  replicaSetName: "rs0"
+  name: spica
+  version: "5.0"
+  storageSize: 2Gi
+  storageClass:
+  resources: {}
+  replicationControllerImage:
+  spicaUsername:
+  spicaPassword:
+  rootUsername:
+  rootPassword:
+  replicaAuthKey:
+
+images:
+  api: spicaengine/api
+  web: spicaengine/spica
+  replicationcontroller: spicaengine/mongoreplicationcontroller
+  migrate: spicaengine/migrate
+
+application:
+  replicas: 1
+  secret: "secret"
+  defaultPassword: spica
+  webBaseUrl: /spica/
+  apiBaseUrl: /api/
+  publicHost: spica.info
+  storageSize: 2Gi
+  storageClass:
+  apiResources: {}
+  webResources: {}
+  args: []
+  diskAccessMode: ReadWriteOnce
+  serviceAccountName: default
+ingress:
+  host:
+  tls: []
+  ingressClassName: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 15M
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 15Mb
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
