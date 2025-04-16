@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 0.9.29
+appVersion: 0.10.0
 description: A Helm chart for Spica
 home: https://spicaengine.com
 icon: https://spicaengine.com/assets/icons/icon-512x512.png
@@ -17,4 +17,4 @@ name: spica
 sources:
 - https://github.com/spica-engine/spica
 type: application
-version: 0.9.29
+version: 0.10.0

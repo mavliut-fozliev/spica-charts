@@ -32,7 +32,7 @@ spec:
   {{- if ne .Values.application.diskAccessMode "ReadWriteMany"}}
   serviceName: {{ .Release.Name }}-application
   {{- end }}
-  replicas: 1
+  replicas: {{ .Values.application.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .Release.Name }}-spica
@@ -50,7 +50,7 @@ spec:
       serviceAccountName: {{ .Values.application.serviceAccountName }}
       containers:
         - name: web
-          image: {{ .Values.images.web }}:{{ $.Chart.AppVersion }}
+          image: {{ .Values.images.web }}:0.9.29
           resources:
 {{ toYaml .Values.application.webResources | indent 12 }}
           ports:
@@ -64,6 +64,16 @@ spec:
 {{ toYaml .Values.application.apiResources | indent 12 }}
           ports:
             - containerPort: 4300
+          readinessProbe:
+            httpGet:
+              path: /passport/strategies
+              port: 4300
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+            successThreshold: 1  
           args: [
 {{if len .Values.application.args}}
 {{- range .Values.application.args }}
@@ -82,6 +92,17 @@ spec:
           volumeMounts:
             - name: {{ .Release.Name }}-data
               mountPath: /data
+          env:
+            - name: MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-database-spica-credentials
+                  key: spicaUsername
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-database-spica-credentials
+                  key: spicaPassword
       {{- if .Values.application.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.application.nodeSelector | indent 8 }}
